@@ -7,21 +7,23 @@
 
 import UIKit
 
-final class CurrencyViewController: UIViewController {
+public final class CurrencyViewController: UIViewController {
   private lazy var mainView = CurrencyView()
+  private let viewModel: CurrencyViewModel
 
-  init() {
+  public init(viewModel: CurrencyViewModel) {
+    self.viewModel = viewModel
     super.init(nibName: nil, bundle: nil)
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  override func loadView() {
+  public override func loadView() {
     self.view = mainView
   }
 
-  override func viewDidLoad() {
+  public override func viewDidLoad() {
     super.viewDidLoad()
 
     binding()
@@ -36,10 +38,13 @@ final class CurrencyViewController: UIViewController {
 import SwiftUI
 
 struct CurrencyVCPreview: PreviewProvider {
-
+  
   static var previews: some View {
-    CurrencyViewController().showPreview()
-    .previewLayout(.sizeThatFits)
+    let viewModel = CurrencyViewModel()
+    let viewController = CurrencyViewController(viewModel: viewModel)
+    viewController
+      .showPreview()
+      .previewLayout(.sizeThatFits)
   }
 }
 #endif

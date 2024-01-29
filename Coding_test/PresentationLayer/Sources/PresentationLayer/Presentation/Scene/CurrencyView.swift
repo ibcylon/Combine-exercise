@@ -7,6 +7,8 @@
 
 import UIKit
 
+import DomainLayer
+
 public final class CurrencyView: UIView {
   private let leftPadding: CGFloat = 20
 
@@ -18,14 +20,19 @@ public final class CurrencyView: UIView {
     return label
   }()
 
-  private(set) lazy var remittanceLabel: UILabel = .contentLabel("송금국가 : ")
+  private(set) lazy var remittanceLabel: UILabel = .contentNameLabel("송금국가 : ")
+  private(set) lazy var remittanceContentLabel: UILabel = .contentLabel("송금국가 : ")
 
-  private(set) lazy var receiptLabel: UILabel = .contentLabel("수취국가 : ")
+  private(set) lazy var receiptLabel: UILabel = .contentNameLabel("수취국가 : ")
+  private(set) lazy var receiptContentLabel: UILabel = .contentLabel("수취국가 : ")
 
-  private(set) lazy var exchangeRateLabel: UILabel = .contentLabel("환율 : ")
-  private(set) lazy var timestampLabel: UILabel = .contentLabel("조회시간 : ")
 
-  private(set) lazy var amountLabel: UILabel = UILabel.contentLabel("송금액 : ")
+  private(set) lazy var exchangeRateLabel: UILabel = .contentNameLabel("환율 : ")
+  private(set) lazy var exchangeContentRateLabel: UILabel = .contentLabel("환율 : ")
+  private(set) lazy var timestampLabel: UILabel = .contentNameLabel("조회시간 : ")
+  private(set) lazy var timestampContentLabel: UILabel = .contentLabel("조회시간 : ")
+
+  private(set) lazy var amountLabel: UILabel = UILabel.contentNameLabel("송금액 : ")
 
   private(set) lazy var textField: UITextField = {
     let textField = UITextField()
@@ -47,8 +54,9 @@ public final class CurrencyView: UIView {
     return label
   }()
 
-  private(set) lazy var pickerView: UIPickerView = {
-    let pickerView = UIPickerView()
+  private lazy var pickerView: BasePickerView = {
+    let pickerView = BasePickerView()
+    pickerView.delegate = self
     return pickerView
   }()
 
@@ -64,10 +72,10 @@ public final class CurrencyView: UIView {
   func makeUI() {
     [
       titleLabel,
-      remittanceLabel,
-      receiptLabel,
-      exchangeRateLabel,
-      timestampLabel,
+      remittanceLabel, remittanceContentLabel,
+      receiptLabel, receiptContentLabel,
+      exchangeRateLabel, exchangeContentRateLabel,
+      timestampLabel, timestampContentLabel,
       amountLabel, textField, currenyLabel,
       infoLabel,
       pickerView
@@ -88,27 +96,41 @@ public final class CurrencyView: UIView {
       remittanceLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 30),
       remittanceLabel.widthAnchor.constraint(equalToConstant: 100),
       remittanceLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: self.leftPadding),
-      
+
+      remittanceContentLabel.topAnchor.constraint(equalTo: remittanceLabel.topAnchor),
+      remittanceContentLabel.leadingAnchor.constraint(equalTo: remittanceLabel.trailingAnchor, constant: 10),
+      remittanceContentLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -self.leftPadding),
+
       receiptLabel.topAnchor.constraint(equalTo: remittanceLabel.bottomAnchor),
       receiptLabel.leadingAnchor.constraint(equalTo: remittanceLabel.leadingAnchor),
       receiptLabel.widthAnchor.constraint(equalToConstant: 100),
+      receiptContentLabel.topAnchor.constraint(equalTo: receiptLabel.topAnchor),
+      receiptContentLabel.leadingAnchor.constraint(equalTo: receiptLabel.trailingAnchor, constant: 10),
+      receiptContentLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -self.leftPadding),
 
       exchangeRateLabel.topAnchor.constraint(equalTo: receiptLabel.bottomAnchor),
       exchangeRateLabel.leadingAnchor.constraint(equalTo: remittanceLabel.leadingAnchor),
       exchangeRateLabel.widthAnchor.constraint(equalToConstant: 100),
+      exchangeContentRateLabel.topAnchor.constraint(equalTo: exchangeRateLabel.topAnchor),
+      exchangeContentRateLabel.leadingAnchor.constraint(equalTo: exchangeRateLabel.trailingAnchor, constant: 10),
+      exchangeContentRateLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -self.leftPadding),
+
       timestampLabel.topAnchor.constraint(equalTo: exchangeRateLabel.bottomAnchor),
       timestampLabel.leadingAnchor.constraint(equalTo: remittanceLabel.leadingAnchor),
       timestampLabel.widthAnchor.constraint(equalToConstant: 100),
+      timestampContentLabel.topAnchor.constraint(equalTo: timestampLabel.topAnchor),
+      timestampContentLabel.leadingAnchor.constraint(equalTo: timestampLabel.trailingAnchor, constant: 10),
+      timestampContentLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -self.leftPadding),
 
       amountLabel.topAnchor.constraint(equalTo: timestampLabel.bottomAnchor),
       amountLabel.leadingAnchor.constraint(equalTo: remittanceLabel.leadingAnchor),
       amountLabel.widthAnchor.constraint(equalToConstant: 100),
 
       textField.centerYAnchor.constraint(equalTo: amountLabel.centerYAnchor),
-      textField.leadingAnchor.constraint(equalTo: amountLabel.trailingAnchor),
-      textField.widthAnchor.constraint(equalToConstant: 100),
+      textField.leadingAnchor.constraint(equalTo: amountLabel.trailingAnchor, constant: 10),
+      textField.widthAnchor.constraint(equalToConstant: 130),
       currenyLabel.topAnchor.constraint(equalTo: amountLabel.topAnchor),
-      currenyLabel.leadingAnchor.constraint(equalTo: textField.trailingAnchor),
+      currenyLabel.leadingAnchor.constraint(equalTo: textField.trailingAnchor, constant: 10),
       infoLabel.topAnchor.constraint(equalTo: amountLabel.bottomAnchor, constant: 30),
       infoLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor),
       infoLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor),
@@ -117,12 +139,23 @@ public final class CurrencyView: UIView {
       pickerView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
       pickerView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
       pickerView.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor),
-      pickerView.heightAnchor.constraint(equalToConstant: 400)
     ])
   }
 
-  func bind(_ model: String) {
-    
+  func bind(_ model: CurrencyInfo) {
+    self.remittanceContentLabel.text = model.source.label
+
+    self.currenyLabel.text = model.source.rawValue
+  }
+
+  func bindQuotos(_ model: [CurrencyEntity]) {
+    self.pickerView.bind(model)
+  }
+}
+
+extension CurrencyView: BasePickerViewDelegate {
+  func didSelectItem(_ item: CurrencyEntity) {
+    print(item)
   }
 }
 
@@ -133,7 +166,10 @@ struct CurrencyViewPreview: PreviewProvider {
 
   static var previews: some View {
     UIViewPreview {
-      return CurrencyView()
+      let view = CurrencyView()
+      view.bind(.init(success: true, terms: "", privacy: "", timestamp: Date(), source: .USD, quotes: [.JPY: 0.0]))
+      view.bindQuotos([.JPY, .PHP, .USD])
+      return view
     }
     .previewLayout(.sizeThatFits)
   }

@@ -12,6 +12,15 @@ extension UILabel {
     let label = UILabel()
     label.font = .systemFont(ofSize: 20, weight: .regular)
     label.textColor = .lightGray
+    label.textAlignment = .left
+    label.text = text//String(String(format: " %@", text).padding(toLength: 8, withPad: " ", startingAt: 0).reversed())
+    return label
+  }
+
+  static func contentNameLabel(_ text: String = "") -> UILabel {
+    let label = UILabel()
+    label.font = .systemFont(ofSize: 20, weight: .regular)
+    label.textColor = .lightGray
     label.textAlignment = .right
     label.text = text//String(String(format: " %@", text).padding(toLength: 8, withPad: " ", startingAt: 0).reversed())
     return label
