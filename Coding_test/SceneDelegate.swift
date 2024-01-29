@@ -7,6 +7,10 @@
 
 import UIKit
 
+import PresentationLayer
+import DomainLayer
+import DataLayer
+
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
   var window: UIWindow?
@@ -19,7 +23,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     guard let windowScene = (scene as? UIWindowScene) else { return }
     window = UIWindow(windowScene: windowScene)
     window?.windowScene = windowScene
-    window?.rootViewController = UINavigationController(rootViewController: CurrencyViewController())
+
+    let viewModel = CurrencyViewModel()
+    let rootViewController = CurrencyViewController(viewModel: viewModel)
+    let navigationController = UINavigationController(rootViewController: rootViewController)
+    window?.rootViewController = UINavigationController(rootViewController: navigationController)
     window?.makeKeyAndVisible()
   }
 
