@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Combine
 
 import DomainLayer
 
@@ -19,6 +20,8 @@ public final class CurrencyView: UIView {
     label.font = .systemFont(ofSize: 40, weight: .regular)
     return label
   }()
+
+  private(set) var currencySelectSubject = PassthroughSubject<CurrencyEntity, Never>()
 
   private(set) lazy var remittanceLabel: UILabel = .contentNameLabel("송금국가 : ")
   private(set) lazy var remittanceContentLabel: UILabel = .contentLabel("송금국가 : ")
@@ -83,6 +86,7 @@ public final class CurrencyView: UIView {
       addSubview($0)
       $0.translatesAutoresizingMaskIntoConstraints = false
     }
+    self.backgroundColor = .white
 
     makeLayout()
   }
@@ -143,19 +147,38 @@ public final class CurrencyView: UIView {
   }
 
   func bind(_ model: CurrencyInfo) {
+    self.bindQuotos(model.quotes.map { $0.key })
     self.remittanceContentLabel.text = model.source.label
 
+    if let (key, value) = model.quotes.first {
+      self.receiptContentLabel.text = key.rawValue
+      self.exchangeContentRateLabel.text = String(value)
+      self.currencySelectSubject.send(key)
+    } else {
+      self.receiptContentLabel.text = ""
+      self.exchangeContentRateLabel.text = ""
+    }
+    self.timestampContentLabel.text = model.timestamp.toString()
     self.currenyLabel.text = model.source.rawValue
   }
 
   func bindQuotos(_ model: [CurrencyEntity]) {
     self.pickerView.bind(model)
   }
+
+  func calculate(_ model: SelectCurrencyModel) {
+    self.infoLabel.text = model.infoText
+  }
+
+  func errorBind(_ error: CurrencyError) {
+    self.infoLabel.text = error.message
+  }
 }
 
 extension CurrencyView: BasePickerViewDelegate {
   func didSelectItem(_ item: CurrencyEntity) {
     print(item)
+    currencySelectSubject.send(item)
   }
 }
 

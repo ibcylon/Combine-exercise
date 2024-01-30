@@ -6,10 +6,13 @@
 //
 
 import Foundation
+import Combine
 
 protocol ViewModelType {
+  typealias InputAction = AnyPublisher<Input, Never>
+  typealias OutputAction = AnyPublisher<Output, Never>
   associatedtype Input
   associatedtype Output
 
-  func transform(input: Input) -> Output
+  func transform(input: InputAction) -> OutputAction
 }

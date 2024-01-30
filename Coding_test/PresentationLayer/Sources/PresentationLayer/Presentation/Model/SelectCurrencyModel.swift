@@ -9,10 +9,10 @@ import Foundation
 import DomainLayer
 
 struct SelectCurrencyModel {
-  let receipt: CurrencyEntity
-  let remittance: CurrencyEntity
   let exchangeRate: Double
-  let timestamp: Double
-  let receiptAmount: Double
+  let selectedCurrency: CurrencyEntity
 
+  var infoText: String {
+    "수취금액은 \(exchangeRate.toString()) \(selectedCurrency.rawValue)입니다."
+  }
 }
