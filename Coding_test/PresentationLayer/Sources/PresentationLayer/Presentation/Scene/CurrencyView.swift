@@ -54,6 +54,7 @@ public final class CurrencyView: UIView {
     label.font = .systemFont(ofSize: 23, weight: .regular)
     label.textColor = .darkGray
     label.text = "수취금액은 입니다."
+    label.numberOfLines = 2
     return label
   }()
 
@@ -168,6 +169,8 @@ public final class CurrencyView: UIView {
 
   func calculate(_ model: SelectCurrencyModel) {
     self.infoLabel.text = model.infoText
+    self.receiptContentLabel.text = model.selectedCurrency.rawValue
+    self.exchangeContentRateLabel.text = String(model.exchangeRate)
   }
 
   func errorBind(_ error: CurrencyError) {
